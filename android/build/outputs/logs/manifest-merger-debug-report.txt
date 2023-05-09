@@ -1,0 +1,41 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml:2:3-9:14
+INJECTED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml:2:3-9:14
+INJECTED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml:2:3-9:14
+	package
+		ADDED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml:3:7-74
+		INJECTED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml
+		INJECTED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml:2:13-71
+uses-permission#android.permission.BLUETOOTH
+ADDED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml:5:7-70
+	android:name
+		ADDED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml:5:24-67
+uses-permission#android.permission.BLUETOOTH_ADMIN
+ADDED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml:6:7-76
+	android:name
+		ADDED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml:6:24-73
+uses-permission#android.permission.BLUETOOTH_CONNECT
+ADDED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml:7:7-78
+	android:name
+		ADDED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml:7:24-75
+uses-permission#android.permission.BLUETOOTH_SCAN
+ADDED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml:8:7-75
+	android:name
+		ADDED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml:8:24-72
+uses-sdk
+INJECTED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml
+INJECTED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml
+INJECTED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml
+INJECTED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml
+		ADDED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml
+		INJECTED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml
+		ADDED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml
+		INJECTED from /Users/mohamadrezakavoosi/Documents/GitHub/capacitor/capacitor-stripe-terminal/android/src/main/AndroidManifest.xml
