@@ -56,7 +56,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/eventOneHQ/capacitor-stripe-terminal"
+    "url": "https://github.com/sam20gh/capacitor-terminal"
   },
   "bugs": {
     "url": "https://github.com/eventOneHQ/capacitor-stripe-terminal/issues"
