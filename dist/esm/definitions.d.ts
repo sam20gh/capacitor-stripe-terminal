@@ -219,14 +219,6 @@ export interface StripeTerminalConfig {
      * An event handler called [when a reader disconnects](https://stripe.com/docs/terminal/readers/connecting/verifone-p400#handling-disconnects) from your app.
      */
     onUnexpectedReaderDisconnect: () => void;
-    /**
-     *
-     */
-    onPaymentStatusChange(status: string): Promise<void>;
-    /**
-     *
-     */
-    onConnectionStatusChange(status: string): Promise<void>;
 }
 /**
  * @category Reader

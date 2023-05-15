@@ -67,7 +67,7 @@ export declare class StripeTerminalPlugin {
      *   },
      *   onConnectionStatusChange: () => {
      *     // handle payment status
-     *   }
+     *   }private _onUnexpectedReaderDisconnect;
      * })
      * ```
      *
@@ -123,7 +123,7 @@ export declare class StripeTerminalPlugin {
     getPaymentStatus(): Promise<PaymentStatus>;
     disconnectReader(): Promise<void>;
     connectionStatus(): Observable<ConnectionStatus>;
-    paymentStatus(): Observable<PaymentStatus>;
+    paymentStatus(): Observable<paymentStatus>;
     installAvailableUpdate(): Promise<void>;
     cancelInstallUpdate(): Promise<void>;
     didRequestReaderInput(): Observable<ReaderInputOptions>;

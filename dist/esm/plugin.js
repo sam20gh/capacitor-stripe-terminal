@@ -46,7 +46,7 @@ export class StripeTerminalPlugin {
             this.selectedSdkType = 'native';
             return Promise.reject('You must initialize StripeTerminalPlugin first.');
         };
-        this._onConnectionStatusChange = () => {
+        this._onPaymentStatusChange = () => {
             // reset the sdk type
             this.selectedSdkType = 'native';
             return Promise.reject('You must initialize StripeTerminalPlugin first.');
@@ -94,30 +94,31 @@ export class StripeTerminalPlugin {
             await StripeTerminal.addListener('didReportUnexpectedReaderDisconnect', () => {
                 this._onUnexpectedReaderDisconnect();
             });
-        this.listeners['changePaymentStatusListenerNative'] =
+            this.listeners['changePaymentStatusListenerNative'] =
             await StripeTerminal.addListener('didChangePaymentStatus', (d) => {
                 this._onPaymentStatusChange(d);
             });
-        this.listeners['changeConnectionStatusListenerNative'] =
+            this.listeners['changeConnectionStatusListenerNative'] =
             await StripeTerminal.addListener('didChangeConnectionStatus', (d) => {
                 this._onConnectionStatusChange(d);
             });
         if (this.stripeTerminalWeb) {
             this.listeners['connectionTokenListenerJs'] =
                 await this.stripeTerminalWeb.addListener('requestConnectionToken', () => this.requestConnectionToken('js'));
-            this.listeners['unexpectedReaderDisconnectListenerJs'] =
+                this.listeners['unexpectedReaderDisconnectListenerJs'] =
                 await this.stripeTerminalWeb.addListener('didReportUnexpectedReaderDisconnect', () => {
                     this._onUnexpectedReaderDisconnect();
                 });
-            this.listeners['changePaymentStatusListenerJs'] =
+                this.listeners['changePaymentStatusListenerJs'] =
                 await this.stripeTerminalWeb.addListener('didChangePaymentStatus', (d) => {
                     this._onPaymentStatusChange(d);
                 });
-            this.listeners['changeConnectionStatusListenerJs'] =
+                this.listeners['changeConnectionStatusListenerJs'] =
                 await this.stripeTerminalWeb.addListener('didChangeConnectionStatus', (d) => {
                     this._onConnectionStatusChange(d);
                 });
         }
+        
         await Promise.all([
             StripeTerminal.initialize(),
             (_a = this.stripeTerminalWeb) === null || _a === void 0 ? void 0 : _a.initialize()
@@ -242,7 +243,7 @@ export class StripeTerminalPlugin {
      *     // handle payment status
      *   },
      *   onConnectionStatusChange: () => {
-     *     // handle payment status
+     *     // handle connection status
      *   }
      * })
      * ```
@@ -532,6 +533,7 @@ export class StripeTerminalPlugin {
             };
         });
     }
+
     paymentStatus() {
         this.ensureInitialized();
         return new Observable(subscriber => {
