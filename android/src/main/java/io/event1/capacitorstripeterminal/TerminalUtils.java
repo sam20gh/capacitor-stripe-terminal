@@ -10,7 +10,7 @@ import com.stripe.stripeterminal.external.models.Charge;
 import com.stripe.stripeterminal.external.models.ChargeJsonAdapter;
 import com.stripe.stripeterminal.external.models.ConnectionStatus;
 import com.stripe.stripeterminal.external.models.DeviceType;
-import com.stripe.stripeterminal.external.models.DiscoveryMethod;
+import com.stripe.stripeterminal.external.models.DiscoveryConfiguration;
 import com.stripe.stripeterminal.external.models.Location;
 import com.stripe.stripeterminal.external.models.PaymentIntent;
 import com.stripe.stripeterminal.external.models.PaymentIntentStatus;
@@ -233,23 +233,23 @@ public class TerminalUtils {
     return object;
   }
 
-  public static DiscoveryMethod translateDiscoveryMethod(Integer method) {
+  public static DiscoveryConfiguration translateDiscoveryMethod(Integer method,boolean isSimulated) {
     if (method == 0) {
-      return DiscoveryMethod.BLUETOOTH_SCAN;
+      return new DiscoveryConfiguration.BluetoothDiscoveryConfiguration(0, isSimulated);
     } else if (method == 1) {
-      return DiscoveryMethod.BLUETOOTH_SCAN;
+      return new DiscoveryConfiguration.BluetoothDiscoveryConfiguration(0, isSimulated);
     } else if (method == 2) {
-      return DiscoveryMethod.INTERNET;
+      return new DiscoveryConfiguration.InternetDiscoveryConfiguration(null, isSimulated);
     } else if (method == 4) {
-      return DiscoveryMethod.USB;
+      return new DiscoveryConfiguration.UsbDiscoveryConfiguration(0, isSimulated);
     } else if (method == 5) {
-      return DiscoveryMethod.EMBEDDED;
+      return new DiscoveryConfiguration.BluetoothDiscoveryConfiguration(0, isSimulated);
     } else if (method == 6) {
-      return DiscoveryMethod.HANDOFF;
+      return new DiscoveryConfiguration.HandoffDiscoveryConfiguration();
     } else if (method == 7) {
-      return DiscoveryMethod.LOCAL_MOBILE;
+      return new DiscoveryConfiguration.LocalMobileDiscoveryConfiguration(isSimulated);
     } else {
-      return DiscoveryMethod.BLUETOOTH_SCAN;
+      return new DiscoveryConfiguration.BluetoothDiscoveryConfiguration(0, isSimulated);
     }
   }
 

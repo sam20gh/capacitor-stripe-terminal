@@ -195,7 +195,9 @@ export class StripeTerminalWeb extends WebPlugin {
             throw error.error;
         }
     }
-    async cancelDiscoverReaders() { }
+    async cancelDiscoverReaders() { 
+        console.log("cancelDiscoverReaders web");
+    }
     async connectInternetReader(options) {
         var _a;
         const sdk = this.ensureInitialized();

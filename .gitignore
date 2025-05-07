@@ -1,4 +1,6 @@
-**.DS_Store
 node_modules/*
-**android/build/*
+changed/*
+android/build/*
 .idea/*
+**.DS_Store
+**android/build/*

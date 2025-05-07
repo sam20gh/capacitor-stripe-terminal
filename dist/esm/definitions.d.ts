@@ -831,6 +831,7 @@ export interface StripeTerminalInterface {
         status: PaymentStatus;
     }>;
     disconnectReader(): Promise<void>;
+    rebootReader(): Promise<void>;
     installAvailableUpdate(): Promise<void>;
     cancelInstallUpdate(): Promise<void>;
     retrievePaymentIntent(options: {

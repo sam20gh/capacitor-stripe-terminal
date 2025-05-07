@@ -18,6 +18,7 @@ buildscript {
 apply plugin: 'com.android.library'
 
 android {
+    namespace "io.event1.capacitorstripeterminal.capacitorstripeterminal"
     compileSdkVersion project.hasProperty('compileSdkVersion') ? rootProject.ext.compileSdkVersion : 32
     defaultConfig {
         minSdkVersion project.hasProperty('minSdkVersion') ? rootProject.ext.minSdkVersion : 22
@@ -36,8 +37,8 @@ android {
         abortOnError false
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -54,7 +55,8 @@ dependencies {
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
-    implementation "com.stripe:stripeterminal:2.17.1"
+    implementation "com.stripe:stripeterminal-localmobile:3.10.2"
+    implementation "com.stripe:stripeterminal:3.10.2"
     implementation("com.squareup.moshi:moshi:1.14.0")
     implementation "com.google.code.gson:gson:2.8.8"
 }

@@ -122,6 +122,7 @@ export declare class StripeTerminalPlugin {
     getConnectionStatus(): Promise<ConnectionStatus>;
     getPaymentStatus(): Promise<PaymentStatus>;
     disconnectReader(): Promise<void>;
+    rebootReader(): Promise<void>;
     connectionStatus(): Observable<ConnectionStatus>;
     paymentStatus(): Observable<paymentStatus>;
     installAvailableUpdate(): Promise<void>;

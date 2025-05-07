@@ -14,8 +14,8 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
 import com.stripe.stripeterminal.Terminal;
-import com.stripe.stripeterminal.external.callable.BluetoothReaderListener;
-import com.stripe.stripeterminal.external.callable.BluetoothReaderReconnectionListener;
+import com.stripe.stripeterminal.external.callable.ReaderListener;
+import com.stripe.stripeterminal.external.callable.ReaderReconnectionListener;
 import com.stripe.stripeterminal.external.callable.Callback;
 import com.stripe.stripeterminal.external.callable.Cancelable;
 import com.stripe.stripeterminal.external.callable.ConnectionTokenCallback;
@@ -26,10 +26,10 @@ import com.stripe.stripeterminal.external.callable.LocationListCallback;
 import com.stripe.stripeterminal.external.callable.PaymentIntentCallback;
 import com.stripe.stripeterminal.external.callable.ReaderCallback;
 import com.stripe.stripeterminal.external.callable.TerminalListener;
-import com.stripe.stripeterminal.external.callable.UsbReaderListener;
 import com.stripe.stripeterminal.external.models.BatteryStatus;
 import com.stripe.stripeterminal.external.models.Cart;
 import com.stripe.stripeterminal.external.models.CartLineItem;
+import com.stripe.stripeterminal.external.models.DisconnectReason;
 import com.stripe.stripeterminal.external.models.CollectConfiguration;
 import com.stripe.stripeterminal.external.models.ConnectionConfiguration.BluetoothConnectionConfiguration;
 import com.stripe.stripeterminal.external.models.ConnectionConfiguration.HandoffConnectionConfiguration;
@@ -39,7 +39,6 @@ import com.stripe.stripeterminal.external.models.ConnectionConfiguration.UsbConn
 import com.stripe.stripeterminal.external.models.ConnectionStatus;
 import com.stripe.stripeterminal.external.models.ConnectionTokenException;
 import com.stripe.stripeterminal.external.models.DiscoveryConfiguration;
-import com.stripe.stripeterminal.external.models.DiscoveryMethod;
 import com.stripe.stripeterminal.external.models.ListLocationsParameters;
 import com.stripe.stripeterminal.external.models.Location;
 import com.stripe.stripeterminal.external.models.PaymentIntent;
@@ -59,6 +58,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
+import android.util.Log;
 
 @CapacitorPlugin(
   name = "StripeTerminal",
@@ -82,10 +82,9 @@ public class StripeTerminal
     ConnectionTokenProvider,
     TerminalListener,
     DiscoveryListener,
-    UsbReaderListener,
     HandoffReaderListener,
-    BluetoothReaderListener,
-    BluetoothReaderReconnectionListener {
+    ReaderListener,
+    ReaderReconnectionListener {
 
   Cancelable pendingDiscoverReaders = null;
   Cancelable pendingCollectPaymentMethod = null;
@@ -109,21 +108,6 @@ public class StripeTerminal
       call.resolve(result);
     }
   }
-
-  @PluginMethod
-  public void initialize(PluginCall call) {
-    if (getPermissionState("location") != PermissionState.GRANTED) {
-      requestPermissionForAlias("location", call, "locationPermsCallback");
-    } else if (
-      getPermissionState("bluetooth") != PermissionState.GRANTED &&
-      Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-    ) {
-      requestPermissionForAlias("bluetooth", call, "bluetoothPermsCallback");
-    } else {
-      _initialize(call);
-    }
-  }
-
   @PermissionCallback
   private void bluetoothPermsCallback(PluginCall call) {
     if (
@@ -145,7 +129,23 @@ public class StripeTerminal
     }
   }
 
+  @PluginMethod
+  public void initialize(PluginCall call) {
+    //Log.d("__STRIPE__","aaaaaa");
+    if (getPermissionState("location") != PermissionState.GRANTED) {
+      requestPermissionForAlias("location", call, "locationPermsCallback");
+    } else if (
+      getPermissionState("bluetooth") != PermissionState.GRANTED &&
+      Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    ) {
+      requestPermissionForAlias("bluetooth", call, "bluetoothPermsCallback");
+    } else {
+      _initialize(call);
+    }
+  }
+
   private void _initialize(PluginCall call) {
+    //Log.d("__STRIPE__","aaaaaa2");
     // turn on bluetooth
     BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter();
     if (!bluetooth.isEnabled()) {
@@ -155,13 +155,14 @@ public class StripeTerminal
     // Check if stripe is initialized
     boolean isInitialized = Terminal.isInitialized();
     if (isInitialized) {
+      //Log.d("__STRIPE__","aaaaaa3");
       JSObject ret = new JSObject();
       ret.put("isInitialized", true);
 
       call.resolve(ret);
       return;
     }
-
+    //Log.d("__STRIPE__","4");
     pendingConnectionTokenCallback = null;
     cancelDiscoverReaders();
     cancelInstallUpdate();
@@ -183,10 +184,12 @@ public class StripeTerminal
     } catch (TerminalException e) {
       //      e.printStackTrace();
       err = e.getErrorMessage();
+    //Log.d("__STRIPE__","_initialize"+err);
       isInitialized = false;
     } catch (IllegalStateException ex) {
       ex.printStackTrace();
       err = ex.getMessage();
+      //Log.d("__STRIPE__","_initialize"+err);
       isInitialized = true;
     }
 
@@ -207,6 +210,8 @@ public class StripeTerminal
     String token = call.getString("token");
     String errorMessage = call.getString("errorMessage");
 
+    //Log.d("__STRIPE__","tnnnnnnnnnnnnnoken");
+    //Log.d("__STRIPE__", errorMessage!= null && !errorMessage.trim().isEmpty() ?errorMessage:"");
     if (pendingConnectionTokenCallback != null) {
       if (errorMessage != null && !errorMessage.trim().isEmpty()) {
         pendingConnectionTokenCallback.onFailure(
@@ -226,15 +231,10 @@ public class StripeTerminal
   public void discoverReaders(final PluginCall call) {
     try {
       Boolean simulated = call.getBoolean("simulated", true);
-      DiscoveryMethod discoveryMethod = TerminalUtils.translateDiscoveryMethod(
-        call.getInt("discoveryMethod", 0)
+      DiscoveryConfiguration discoveryConfiguration = TerminalUtils.translateDiscoveryMethod(
+        call.getInt("discoveryMethod", 0),simulated
       );
 
-      DiscoveryConfiguration discoveryConfiguration = new DiscoveryConfiguration(
-        0,
-        discoveryMethod,
-        simulated
-      );
       Callback statusCallback = new Callback() {
         @Override
         public void onSuccess() {
@@ -251,10 +251,7 @@ public class StripeTerminal
 
       // Attempt to cancel any pending discoverReader calls first.
       cancelDiscoverReaders();
-      pendingDiscoverReaders =
-        Terminal
-          .getInstance()
-          .discoverReaders(discoveryConfiguration, this, statusCallback);
+      pendingDiscoverReaders =Terminal.getInstance().discoverReaders(discoveryConfiguration, this, statusCallback);
     } catch (Exception e) {
       e.printStackTrace();
 
@@ -264,8 +261,12 @@ public class StripeTerminal
     }
   }
 
+
+
   @PluginMethod
   public void cancelDiscoverReaders(final PluginCall call) {
+    //Log.d("__STRIPE__",pendingDiscoverReaders!=null ? "no null":"null");
+    //Log.d("__STRIPE__",pendingDiscoverReaders!=null && !pendingDiscoverReaders.isCompleted()?"no complete":"complete");
     if (
       pendingDiscoverReaders != null && !pendingDiscoverReaders.isCompleted()
     ) {
@@ -289,6 +290,8 @@ public class StripeTerminal
   }
 
   public void cancelDiscoverReaders() {
+    //Log.d("__STRIPE__",pendingDiscoverReaders!=null ? "no null":"null");
+    //Log.d("__STRIPE__",pendingDiscoverReaders!=null && !pendingDiscoverReaders.isCompleted()?"no complete":"complete");
     if (
       pendingDiscoverReaders != null && !pendingDiscoverReaders.isCompleted()
     ) {
@@ -296,11 +299,14 @@ public class StripeTerminal
         new Callback() {
           @Override
           public void onSuccess() {
+            //Log.d("__STRIPE__","sucess");
             pendingDiscoverReaders = null;
           }
 
           @Override
-          public void onFailure(@NonNull TerminalException e) {}
+          public void onFailure(@NonNull TerminalException e) {
+            //Log.d("__STRIPE__",e.getErrorMessage());
+          }
         }
       );
     }
@@ -377,6 +383,7 @@ public class StripeTerminal
   public void connectBluetoothReader(final PluginCall call) {
     Reader reader = getReaderFromDiscovered(call);
 
+    //Log.d("__STRIPE__",reader==null ? "no connectBluetoothReader ":"has connectBluetoothReader");
     if (reader == null) {
       return;
     }
@@ -482,7 +489,6 @@ public class StripeTerminal
     }
 
     HandoffConnectionConfiguration connectionConfig = new HandoffConnectionConfiguration(
-      locationId
     );
 
     Terminal
@@ -496,7 +502,32 @@ public class StripeTerminal
   }
 
   @PluginMethod
+  public void rebootReader(final PluginCall call) {
+    //Log.d("__STRIPE__",Terminal.getInstance().getConnectedReader()==null ? "no disconnectReader ":"has disconnectReader");
+    if (Terminal.getInstance().getConnectedReader() == null) {
+      call.resolve();
+    } else {
+      Terminal
+        .getInstance()
+        .rebootReader(
+          new Callback() {
+            @Override
+            public void onSuccess() {
+              call.resolve();
+            }
+
+            @Override
+            public void onFailure(@NonNull TerminalException e) {
+              call.reject(e.getErrorMessage(), e);
+            }
+          }
+        );
+    }
+  }
+
+  @PluginMethod
   public void disconnectReader(final PluginCall call) {
+    //Log.d("__STRIPE__",Terminal.getInstance().getConnectedReader()==null ? "no disconnectReader ":"has disconnectReader");
     if (Terminal.getInstance().getConnectedReader() == null) {
       call.resolve();
     } else {
@@ -523,6 +554,7 @@ public class StripeTerminal
     Reader reader = Terminal.getInstance().getConnectedReader();
     JSObject ret = new JSObject();
 
+    //Log.d("__STRIPE__",reader==null ? "no getConnectedReader ":"has getConnectedReader");
     if (reader == null) {
       ret.put("reader", JSObject.NULL);
     } else {
@@ -671,7 +703,7 @@ public class StripeTerminal
     if (currentPaymentIntent != null) {
       Terminal
         .getInstance()
-        .processPayment(
+        .confirmPaymentIntent(
           currentPaymentIntent,
           new PaymentIntentCallback() {
             @Override
@@ -753,6 +785,11 @@ public class StripeTerminal
       );
     }
   }
+
+
+
+
+
 
   @PluginMethod
   public void setReaderDisplay(@NonNull final PluginCall call) {
@@ -903,7 +940,8 @@ public class StripeTerminal
 
     SimulatorConfiguration newConfig = new SimulatorConfiguration(
       availableReaderUpdate,
-      simulatedCard
+      simulatedCard,
+      null
     );
 
     Terminal.getInstance().setSimulatorConfiguration(newConfig);
@@ -940,16 +978,19 @@ public class StripeTerminal
   public void fetchConnectionToken(
     @NonNull ConnectionTokenCallback connectionTokenCallback
   ) {
+    //Log.d("__STRIPE__","connectionTokenCallback");
     pendingConnectionTokenCallback = connectionTokenCallback;
 
     JSObject ret = new JSObject();
     notifyListeners("requestConnectionToken", ret);
+    
   }
 
   @Override
   public void onConnectionStatusChange(
     @NonNull ConnectionStatus connectionStatus
   ) {
+    //Log.d("__STRIPE__","onConnectionStatusChange");
     JSObject ret = new JSObject();
     ret.put(
       "status",
@@ -1095,13 +1136,13 @@ public class StripeTerminal
   }
 
   @Override
-  public void onReaderReconnectStarted(@NonNull Cancelable cancelReconnect) {
+  public void onReaderReconnectStarted( Reader reader, Cancelable cancelReconnect,DisconnectReason reason ) {
     pendingReaderAutoReconnect = cancelReconnect;
     notifyListeners("didStartReaderReconnect", null);
   }
 
   @Override
-  public void onReaderReconnectSucceeded() {
+  public void onReaderReconnectSucceeded(@NonNull Reader reader) {
     pendingReaderAutoReconnect = null;
     notifyListeners("didSucceedReaderReconnect", null);
   }
