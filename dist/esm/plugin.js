@@ -42,12 +42,26 @@ export class StripeTerminalPlugin {
             return Promise.reject('You must initialize StripeTerminalPlugin first.');
         };
         this._onPaymentStatusChange = () => {
-            // reset the sdk type
             this.selectedSdkType = 'native';
             return Promise.reject('You must initialize StripeTerminalPlugin first.');
         };
-        this._onPaymentStatusChange = () => {
-            // reset the sdk type
+        this._onConnectionStatusChange = () => {
+            this.selectedSdkType = 'native';
+            return Promise.reject('You must initialize StripeTerminalPlugin first.');
+        };
+        this._onReportReaderSoftwareUpdateProgress = () => {
+            this.selectedSdkType = 'native';
+            return Promise.reject('You must initialize StripeTerminalPlugin first.');
+        };
+        this._onFinishInstallingUpdate = () => {
+            this.selectedSdkType = 'native';
+            return Promise.reject('You must initialize StripeTerminalPlugin first.');
+        };
+        this._onReportAvailableUpdate = () => {
+            this.selectedSdkType = 'native';
+            return Promise.reject('You must initialize StripeTerminalPlugin first.');
+        };
+        this._onStartInstallingUpdate = () => {
             this.selectedSdkType = 'native';
             return Promise.reject('You must initialize StripeTerminalPlugin first.');
         };
@@ -60,6 +74,10 @@ export class StripeTerminalPlugin {
         this._onUnexpectedReaderDisconnect = options.onUnexpectedReaderDisconnect;
         this._onPaymentStatusChange = options.onPaymentStatusChange;
         this._onConnectionStatusChange = options.onConnectionStatusChange;
+        this._onReportReaderSoftwareUpdateProgress = options.onReportReaderSoftwareUpdateProgress;
+        this._onFinishInstallingUpdate = options.onFinishInstallingUpdate;
+        this._onReportAvailableUpdate = options.onReportAvailableUpdate;
+        this._onStartInstallingUpdate = options.onStartInstallingUpdate;
     }
     isNative() {
         return (Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android');
@@ -84,19 +102,17 @@ export class StripeTerminalPlugin {
     }
     async init() {
         var _a;
-        console.log("aaaaaaaaaaaa");
         if (this.isNative()) {
             // if on native android or ios, initialize the js sdk as well
             this.stripeTerminalWeb = new StripeTerminalWeb();
         }
-        console.log("2222222");
         this.listeners['connectionTokenListenerNative'] =
             await StripeTerminal.addListener('requestConnectionToken', () => this.requestConnectionToken('native'));
         this.listeners['unexpectedReaderDisconnectListenerNative'] =
             await StripeTerminal.addListener('didReportUnexpectedReaderDisconnect', () => {
                 this._onUnexpectedReaderDisconnect();
             });
-         this.listeners['changePaymentStatusListenerNative'] =
+        this.listeners['changePaymentStatusListenerNative'] =
             await StripeTerminal.addListener('didChangePaymentStatus', (d) => {
                 this._onPaymentStatusChange(d);
             });
@@ -104,24 +120,54 @@ export class StripeTerminalPlugin {
             await StripeTerminal.addListener('didChangeConnectionStatus', (d) => {
                 this._onConnectionStatusChange(d);
             });
-            console.log("2222222"+this.stripeTerminalWeb);
+        this.listeners['onReportReaderSoftwareUpdateProgressListenerNative'] =
+            await StripeTerminal.addListener('didReportReaderSoftwareUpdateProgress', (d) => {
+                this._onReportReaderSoftwareUpdateProgress(d);
+            });
+        this.listeners['finishInstallingUpdateListenerNative'] =
+            await StripeTerminal.addListener('didFinishInstallingUpdate', (d) => {
+                this._onFinishInstallingUpdate(d);
+            });
+        this.listeners['reportAvailableUpdateListenerNative'] =
+            await StripeTerminal.addListener('didReportAvailableUpdate', (d) => {
+                this._onReportAvailableUpdate(d);
+            });
+        this.listeners['startInstallingUpdateListenerNative'] =
+            await StripeTerminal.addListener('didStartInstallingUpdate', (d) => {
+                this._onStartInstallingUpdate(d);
+            });
         if (this.stripeTerminalWeb) {
             this.listeners['connectionTokenListenerJs'] =
                 await this.stripeTerminalWeb.addListener('requestConnectionToken', () => this.requestConnectionToken('js'));
-                this.listeners['unexpectedReaderDisconnectListenerJs'] =
+            this.listeners['unexpectedReaderDisconnectListenerJs'] =
                 await this.stripeTerminalWeb.addListener('didReportUnexpectedReaderDisconnect', () => {
                     this._onUnexpectedReaderDisconnect();
                 });
-                this.listeners['changePaymentStatusListenerJs'] =
+            this.listeners['changePaymentStatusListenerJs'] =
                 await this.stripeTerminalWeb.addListener('didChangePaymentStatus', (d) => {
                     this._onPaymentStatusChange(d);
                 });
-                this.listeners['changeConnectionStatusListenerJs'] =
+            this.listeners['changeConnectionStatusListenerJs'] =
                 await this.stripeTerminalWeb.addListener('didChangeConnectionStatus', (d) => {
                     this._onConnectionStatusChange(d);
                 });
+            this.listeners['reportReaderSoftwareUpdateProgressListenerJs'] =
+                await this.stripeTerminalWeb.addListener('didReportReaderSoftwareUpdateProgress', (d) => {
+                    this._onReportReaderSoftwareUpdateProgress(d);
+                });
+            this.listeners['finishInstallingUpdateListenerJs'] =
+                await StripeTerminal.addListener('didFinishInstallingUpdate', (d) => {
+                    this._onFinishInstallingUpdate(d);
+                });
+            this.listeners['reportAvailableUpdateListenerJs'] =
+                await StripeTerminal.addListener('didReportAvailableUpdate', (d) => {
+                    this._onReportAvailableUpdate(d);
+                });
+            this.listeners['startInstallingUpdateListenerJs'] =
+                await StripeTerminal.addListener('didStartInstallingUpdate', (d) => {
+                    this._onStartInstallingUpdate(d);
+                });
         }
-        
         await Promise.all([
             StripeTerminal.initialize(),
             (_a = this.stripeTerminalWeb) === null || _a === void 0 ? void 0 : _a.initialize()
@@ -241,10 +287,10 @@ export class StripeTerminalPlugin {
      *   },
      *   onUnexpectedReaderDisconnect: () => {
      *     // handle reader disconnect
-     *   },
+     *   }
      *   onPaymentStatusChange: () => {
      *     // handle payment status
-     *   },
+     *   }
      *   onConnectionStatusChange: () => {
      *     // handle connection status
      *   }
@@ -263,7 +309,7 @@ export class StripeTerminalPlugin {
         try {
             (_a = this.listeners['readersDiscoveredNative']) === null || _a === void 0 ? void 0 : _a.remove();
             (_b = this.listeners['readersDiscoveredJs']) === null || _b === void 0 ? void 0 : _b.remove();
-            if (!this.isDiscovering ) {
+            if (!this.isDiscovering) {
                 return;
             }
             await Promise.all([
@@ -338,41 +384,48 @@ export class StripeTerminalPlugin {
             if (options.discoveryMethod === DiscoveryMethod.Internet) {
                 this.selectedSdkType = 'js';
             }
-            this.sdk.addListener('readersDiscovered', (event) => {
+            this.sdk
+                .addListener('readersDiscovered', (event) => {
                 var _a;
                 const readers = ((_a = event === null || event === void 0 ? void 0 : event.readers) === null || _a === void 0 ? void 0 : _a.map(this.normalizeReader)) || [];
                 nativeReaderList = readers;
                 // combine the reader list with the latest reader list from the js sdk
-                console.log("readersDiscovered  !!!",nativeReaderList,jsReaderList);
                 subscriber.next([...nativeReaderList, ...jsReaderList]);
-            }).then(l => {
+            })
+                .then(l => {
                 this.listeners['readersDiscoveredNative'] = l;
             });
-            const nativeOptions = Object.assign(Object.assign({}, options), { discoveryMethod: options.discoveryMethod === DiscoveryMethod.Both ? DiscoveryMethod.BluetoothScan      : options.discoveryMethod });
+            const nativeOptions = Object.assign(Object.assign({}, options), { discoveryMethod: options.discoveryMethod === DiscoveryMethod.Both
+                    ? DiscoveryMethod.BluetoothScan
+                    : options.discoveryMethod });
             if (nativeOptions.discoveryMethod !== DiscoveryMethod.Internet) {
                 // remove locationId if the native discovery method is not internet
                 nativeOptions.locationId = undefined;
             }
             // start discovery
             this.isDiscovering = true;
-            console.log("START DESCOVERY !!!");
-            this.sdk.discoverReaders(nativeOptions).then(() => {
-                console.log("THEN DESCOVERY !!!");
+            this.sdk
+                .discoverReaders(nativeOptions)
+                .then(() => {
                 this.isDiscovering = false;
                 subscriber.complete();
-            }).catch((err) => {
+            })
+                .catch((err) => {
                 this.isDiscovering = false;
                 subscriber.error(err);
             });
             // if using the both method, search with the js sdk as well
-            if (options.discoveryMethod === DiscoveryMethod.Both && this.stripeTerminalWeb) {
-                this.stripeTerminalWeb.addListener('readersDiscovered', (event) => {
+            if (options.discoveryMethod === DiscoveryMethod.Both &&
+                this.stripeTerminalWeb) {
+                this.stripeTerminalWeb
+                    .addListener('readersDiscovered', (event) => {
                     var _a;
                     const readers = ((_a = event === null || event === void 0 ? void 0 : event.readers) === null || _a === void 0 ? void 0 : _a.map(this.normalizeReader)) || [];
                     jsReaderList = readers;
                     // combine the reader list with the latest reader list from the native sdk
                     subscriber.next([...nativeReaderList, ...jsReaderList]);
-                }).then(l => {
+                })
+                    .then(l => {
                     this.listeners['readersDiscoveredJs'] = l;
                 });
                 const jsOptions = Object.assign(Object.assign({}, options), { discoveryMethod: DiscoveryMethod.Internet // discovery method is always going to be internet for the js sdk, although, it really doesn't matter because it will be ignored anyway
@@ -435,6 +488,7 @@ export class StripeTerminalPlugin {
      * @returns Reader
      */
     async connectLocalMobileReader(reader, config) {
+        console.log(Object.assign({ serialNumber: reader.serialNumber }, config));
         this.ensureInitialized();
         // if connecting to a local reader, make sure to switch to the native SDK
         this.selectedSdkType = 'native';
@@ -483,10 +537,6 @@ export class StripeTerminalPlugin {
         this.ensureInitialized();
         return await this.sdk.disconnectReader();
     }
-    async rebootReader() {
-        this.ensureInitialized();
-        return await this.sdk.rebootReader();
-    }
     connectionStatus() {
         this.ensureInitialized();
         return new Observable(subscriber => {
@@ -533,7 +583,6 @@ export class StripeTerminalPlugin {
             };
         });
     }
-
     paymentStatus() {
         this.ensureInitialized();
         return new Observable(subscriber => {
@@ -667,7 +716,14 @@ export class StripeTerminalPlugin {
         this.ensureInitialized();
         return await this.sdk.clearCachedCredentials();
     }
-    
+    async cleanupTerminal() {
+        this.ensureInitialized();
+        await this.sdk.cleanupTerminal();
+    }
+    async rebootReader() {
+        this.ensureInitialized();
+        await this.sdk.rebootReader();
+    }
     async setReaderDisplay(cart) {
         this.ensureInitialized();
         // ignore if the sdk is currently collecting a payment method

@@ -82,6 +82,8 @@ export declare class StripeTerminalWeb extends WebPlugin implements StripeTermin
         intent: PaymentIntent;
     }>;
     clearCachedCredentials(): Promise<void>;
+    cleanupTerminal(): Promise<void>;
+    rebootReader(): Promise<void>;
     setReaderDisplay(cart: Cart): Promise<void>;
     clearReaderDisplay(): Promise<void>;
     listLocations(options?: ListLocationsParameters): Promise<{

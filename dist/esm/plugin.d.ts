@@ -19,6 +19,10 @@ export declare class StripeTerminalPlugin {
     private _onUnexpectedReaderDisconnect;
     private _onPaymentStatusChange;
     private _onConnectionStatusChange;
+    private _onReportReaderSoftwareUpdateProgress;
+    private _onFinishInstallingUpdate;
+    private _onReportAvailableUpdate;
+    private _onStartInstallingUpdate;
     private isDiscovering;
     private isCollectingPaymentMethod;
     private listeners;
@@ -61,13 +65,13 @@ export declare class StripeTerminalPlugin {
      *   },
      *   onUnexpectedReaderDisconnect: () => {
      *     // handle reader disconnect
-     *   },
+     *   }
      *   onPaymentStatusChange: () => {
      *     // handle payment status
-     *   },
+     *   }
      *   onConnectionStatusChange: () => {
-     *     // handle payment status
-     *   }private _onUnexpectedReaderDisconnect;
+     *     // handle connection status
+     *   }
      * })
      * ```
      *
@@ -122,9 +126,8 @@ export declare class StripeTerminalPlugin {
     getConnectionStatus(): Promise<ConnectionStatus>;
     getPaymentStatus(): Promise<PaymentStatus>;
     disconnectReader(): Promise<void>;
-    rebootReader(): Promise<void>;
     connectionStatus(): Observable<ConnectionStatus>;
-    paymentStatus(): Observable<paymentStatus>;
+    paymentStatus(): Observable<PaymentStatus>;
     installAvailableUpdate(): Promise<void>;
     cancelInstallUpdate(): Promise<void>;
     didRequestReaderInput(): Observable<ReaderInputOptions>;
@@ -141,6 +144,8 @@ export declare class StripeTerminalPlugin {
     cancelCollectPaymentMethod(): Promise<void>;
     processPayment(): Promise<PaymentIntent | null>;
     clearCachedCredentials(): Promise<void>;
+    cleanupTerminal(): Promise<void>;
+    rebootReader(): Promise<void>;
     setReaderDisplay(cart: Cart): Promise<void>;
     clearReaderDisplay(): Promise<void>;
     listLocations(options?: ListLocationsParameters): Promise<{

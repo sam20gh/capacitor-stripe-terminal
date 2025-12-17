@@ -195,9 +195,7 @@ export class StripeTerminalWeb extends WebPlugin {
             throw error.error;
         }
     }
-    async cancelDiscoverReaders() { 
-        console.log("cancelDiscoverReaders web");
-    }
+    async cancelDiscoverReaders() { }
     async connectInternetReader(options) {
         var _a;
         const sdk = this.ensureInitialized();
@@ -395,6 +393,10 @@ export class StripeTerminalWeb extends WebPlugin {
     async clearCachedCredentials() {
         const sdk = this.ensureInitialized();
         await sdk.clearCachedCredentials();
+    }
+    async cleanupTerminal() {
+    }
+    async rebootReader() {
     }
     async setReaderDisplay(cart) {
         const sdk = this.ensureInitialized();

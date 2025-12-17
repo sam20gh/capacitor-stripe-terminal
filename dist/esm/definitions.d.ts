@@ -219,6 +219,26 @@ export interface StripeTerminalConfig {
      * An event handler called [when a reader disconnects](https://stripe.com/docs/terminal/readers/connecting/verifone-p400#handling-disconnects) from your app.
      */
     onUnexpectedReaderDisconnect: () => void;
+    /**
+     * An event handler that [fetches a connection token](https://stripe.com/docs/terminal/sdk/js#connection-token) from your backend.
+     */
+    onPaymentStatusChange: () => Promise<string>;
+    /**
+     * An event handler that [fetches a connection token](https://stripe.com/docs/terminal/sdk/js#connection-token) from your backend.
+     */
+    onConnectionStatusChange: () => Promise<string>;
+    onReportReaderSoftwareUpdateProgress: () => Promise<{
+        progress: ReaderSoftwareUpdate | null;
+    }>;
+    onFinishInstallingUpdate: () => Promise<{
+        update: ReaderSoftwareUpdate | null;
+    }>;
+    onReportAvailableUpdate: () => Promise<{
+        update: ReaderSoftwareUpdate | null;
+    }>;
+    onStartInstallingUpdate: () => Promise<{
+        update: ReaderSoftwareUpdate | null;
+    }>;
 }
 /**
  * @category Reader
@@ -831,7 +851,6 @@ export interface StripeTerminalInterface {
         status: PaymentStatus;
     }>;
     disconnectReader(): Promise<void>;
-    rebootReader(): Promise<void>;
     installAvailableUpdate(): Promise<void>;
     cancelInstallUpdate(): Promise<void>;
     retrievePaymentIntent(options: {
@@ -847,6 +866,8 @@ export interface StripeTerminalInterface {
         intent: PaymentIntent;
     }>;
     clearCachedCredentials(): Promise<void>;
+    cleanupTerminal(): Promise<void>;
+    rebootReader(): Promise<void>;
     setReaderDisplay(cart: Cart): Promise<void>;
     clearReaderDisplay(): Promise<void>;
     listLocations(parameters?: ListLocationsParameters): Promise<{

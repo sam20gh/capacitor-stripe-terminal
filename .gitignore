@@ -4,3 +4,4 @@ android/build/*
 .idea/*
 **.DS_Store
 **android/build/*
+android/.gradle/
